@@ -47,5 +47,5 @@ Your feedback and suggestions are always welcome.
 
 
 <div align="center">
-Made with dedication for academic excellence 🎓
+A complete academic documentation showcase. 🎓
 </div>
