@@ -26,12 +26,8 @@ We encourage you to explore the complete documentation to understand the project
 
 You can find the updated documents here:
 
-- 📌 API Design  
-- 🏗️ System Design  
-- 📄 Software Requirement Specification (SRS)  
-- 📊 UML Diagrams  
-- 🧪 Testing Documentation  
-- 📘 Additional Supporting Documents  
+- [Software Requirement Specification](https://github.com/Irshad-11/Simple-Planner/blob/main/docs/SRS.md)
+- [System Design](https://github.com/Irshad-11/Simple-Planner/blob/main/docs/SystemDesign.md)
 
 
 ## 🚀 Explore the Docs
