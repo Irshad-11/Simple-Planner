@@ -1,0 +1,7 @@
+.env
+venv
+
+app/__pycache__
+app/__init__.py
+
+spring-boot-app/target
