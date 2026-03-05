@@ -2,3 +2,42 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+/* Custom scrollbar – hidden until hover (very clean look) */
+
+/* Firefox */
+* {
+  scrollbar-width: none;   /* completely hides scrollbar in Firefox */
+}
+
+
+
+:root {
+  --bg:           theme('colors.light-bg');
+  --bg-secondary: theme('colors.light-bg-secondary');
+  --text:         theme('colors.light-text');
+  --text-muted:   theme('colors.light-text-muted');
+  --border:       theme('colors.light-border');
+  --accent:       theme('colors.light-accent');
+  --accent-hover: theme('colors.light-accent-hover');
+  --accent-soft:  theme('colors.light-accent-soft');
+
+  --input-bg: theme('colors.light-bg-secondary');   /* #ffffff */
+
+}
+
+.dark {
+  --bg:           theme('colors.dark-bg');
+  --bg-secondary: theme('colors.dark-bg-secondary');
+  --text:         theme('colors.dark-text');
+  --text-muted:   theme('colors.dark-text-muted');
+  --border:       theme('colors.dark-border');
+  --accent:       theme('colors.dark-accent');
+  --accent-hover: theme('colors.dark-accent-hover');
+  --accent-soft:  theme('colors.dark-accent-soft');
+
+  --input-bg: #1e293b;          /* slate-800 */
+
+}

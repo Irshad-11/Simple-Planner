@@ -1,89 +1,64 @@
+# run.py flask --app run run
 from flask import Flask, jsonify
 from flask_cors import CORS
-import psycopg2
-import requests
+from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 import os
+from dotenv import load_dotenv
+
+from config import Config
+from models import db
+from auth import auth_bp
+
+load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+app.config.from_object(Config)
 
-# -----------------------------
-# DATABASE CONFIG
-# -----------------------------
-DB_CONFIG = {
-    "host": "localhost",
-    "database": "simpleplanner",
-    "user": "planneruser",
-    "password": "plannerpass",
-    "port": 5432
-}
+# ── JWT configuration ───────────────────────────────────────────────
+# These ensure JWT looks for "Authorization: Bearer <token>" in headers
+app.config['JWT_TOKEN_LOCATION'] = ['headers']          # default, but good to be explicit
+app.config['JWT_HEADER_NAME'] = 'Authorization'         # default
+app.config['JWT_HEADER_TYPE'] = 'Bearer'                # default
+# app.config['JWT_SECRET_KEY'] is already loaded from .env via Config
 
-SPRING_BOOT_URL = "http://localhost:8080/api/data"
+CORS(app,
+     resources={
+         r"/*": {  # ← apply to ALL routes (safest for dev)
+             "origins": ["http://localhost:5173"],  # ← your exact Vite/React port
+             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
+             "allow_headers": ["Content-Type", "Authorization", "Accept"],
+             "expose_headers": ["Authorization"],
+             "supports_credentials": True,
+             "max_age": 600  # cache preflight for 10 min
+         }
+     })
 
+db.init_app(app)
+migrate = Migrate(app, db)
+jwt = JWTManager(app)
 
-# -----------------------------
-# PostgreSQL Check
-# -----------------------------
-def check_postgres():
-    try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        cur = conn.cursor()
-        cur.execute("SELECT 1;")
-        result = cur.fetchone()
-        cur.close()
-        conn.close()
-
-        return {
-            "status": "working",
-            "response": result[0]
-        }
-
-    except Exception as e:
-        return {
-            "status": "error",
-            "error": str(e)
-        }
+# Register blueprints
+app.register_blueprint(auth_bp)
 
 
-# -----------------------------
-# Spring Boot Check
-# -----------------------------
-def check_spring():
-    try:
-        response = requests.get(SPRING_BOOT_URL, timeout=3)
-        return {
-            "status": "working",
-            "response": response.json()
-        }
-    except Exception as e:
-        return {
-            "status": "error",
-            "error": str(e)
-        }
-
-
-# -----------------------------
-# Full System Health Endpoint
-# -----------------------------
+# ── Health check (your original one kept + simplified) ───────────────
 @app.route("/flask/system-status")
 def system_status():
-
-    postgres_status = check_postgres()
-    spring_status = check_spring()
-
-    overall_status = (
-        postgres_status["status"] == "working" and
-        spring_status["status"] == "working"
-    )
+    try:
+        db.session.execute("SELECT 1;")
+        postgres_ok = True
+    except:
+        postgres_ok = False
 
     return jsonify({
-        "react": "working",
         "flask": "working",
-        "postgresql": postgres_status,
-        "spring_boot": spring_status,
-        "overall": "healthy" if overall_status else "partial_failure"
+        "postgresql": "working" if postgres_ok else "error",
+        "overall": "healthy" if postgres_ok else "partial_failure"
     })
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    with app.app_context():
+        db.create_all()           # creates tables if not exist (development only)
+    app.run(debug=True, port=5000)
