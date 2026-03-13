@@ -7,8 +7,13 @@ import os
 from dotenv import load_dotenv
 
 from config import Config
-from models import db
+from models import db, Task
 from auth import auth_bp
+from tasks import tasks_bp
+from todos import todos_bp
+from planner import planner_bp
+from notes import notes_bp
+from dashboard import dashboard_bp
 
 load_dotenv()
 
@@ -40,7 +45,11 @@ jwt = JWTManager(app)
 
 # Register blueprints
 app.register_blueprint(auth_bp)
-
+app.register_blueprint(tasks_bp)
+app.register_blueprint(todos_bp)
+app.register_blueprint(planner_bp)
+app.register_blueprint(notes_bp)
+app.register_blueprint(dashboard_bp)
 
 # ── Health check (your original one kept + simplified) ───────────────
 @app.route("/flask/system-status")
